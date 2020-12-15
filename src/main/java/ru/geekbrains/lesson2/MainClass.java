@@ -3,6 +3,8 @@ package ru.geekbrains.lesson2;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
+import static java.lang.Math.abs;
+
 public class MainClass {
 
     public static void main(String[] args) {
@@ -12,6 +14,8 @@ public class MainClass {
         doDiagonalMatrix(); //task4
         doTwoDiagonalMatrix(); //Крестиком :)
         findMinAndMaxElements(); //task 5
+        printBalanceStatus(); //task 6
+        printShift(); //task 7
     }
 
     /**
@@ -20,7 +24,7 @@ public class MainClass {
      * С помощью цикла и условия заменить 0 на 1, 1 на 0;
      */
     public static void invertArray(){
-        System.out.println("\nTask 1\n:");
+        System.out.println("\nTask 1. Invert element value:\n");
         int[] array;
         int len = 7;
         System.out.println("Please, enter array length (default value is 7):");
@@ -33,7 +37,7 @@ public class MainClass {
                 System.out.println("It's not an whole number! Please, try again:");
             }
         } while (true);
-        array = generateZeroOneArray(len);
+        array = generateZeroOneArray(len); //массив исходный генерируется
         printArray(array);
         for (int i = 0; i < array.length; i++) {
              array[i] = (array[i] == 0) ? 1 : 0; // тройной оператор, эквивалентно этому:
@@ -61,7 +65,7 @@ public class MainClass {
     public static void setProgression() {
         int[] arr = new int[8];
         arr[0] = 0;
-        System.out.println("\nTask 2:\n");
+        System.out.println("\nTask 2. Arithmetic progression:\n");
         for (int i = 1; i < arr.length; i++) {
             arr[i] = arr[i-1] + 3;
         }
@@ -74,7 +78,7 @@ public class MainClass {
      */
     public static void multiplyLessSix(){
        int[] array = {1, 5, 3, 2, 11, 4, 5, 2, 4, 8, 9, 1};
-        System.out.println("\nTask 3:\n");
+       System.out.println("\nTask 3. Multiply if element is less 6:\n");
        printArray(array);
        for (int i = 0; i < array.length; i++){
            if (array[i] < 6) {
@@ -92,7 +96,7 @@ public class MainClass {
     public static void doDiagonalMatrix(){
         int n = 5;
         int[][] matrix = new int[n][n];
-        System.out.println("\nTask 4:\n");
+        System.out.println("\nTask 4 with main diagonal:\n");
         for (int i = 0; i < n; i++) {
             matrix[i][i] = 1;
         }
@@ -107,7 +111,7 @@ public class MainClass {
     public static void doTwoDiagonalMatrix(){
         int n = 5;
         int[][] matrix = new int[n][n];
-        System.out.println("\nTask 4-2:\n");
+        System.out.println("\nTask 4 with main and side diagonals:\n");
         for (int i = 0; i < n; i++) {
             matrix[i][i] = 1;
             matrix[n-i-1][i] = 1;
@@ -122,7 +126,7 @@ public class MainClass {
      */
     public static void findMinAndMaxElements() {
         int[] array = {10, 5, 3, 2, 11, 4, -255, 5, 2, 4, 8, 9, 1};
-        System.out.println("\nTask 5:\n");
+        System.out.println("\nTask 5. Find Min and Max elements:\n");
         printArray(array);
         int maxElement = array[0];
         int minElement = array[0];
@@ -151,13 +155,36 @@ public class MainClass {
      * граница показана символами ||, эти символы в массив не входят.
      */
     public static void printBalanceStatus(){
-        int[] arr;
-
+        System.out.println("\nTask 6. Balance\n");
+        int[] arr = {2, 2, 2, 1, 2, 2, 10, 1};
+        printArray(arr);
+        if (checkBalance(arr)) {
+            System.out.println("This array is balanced");
+        } else {
+            System.out.println("This array isn't balansed");
+        }
 
     }
 
-    private static boolean checkBalance(){
+    private static boolean checkBalance(int[] array){
+        int leftSum = 0;
+        int rightSum = 0;
+        for (int i = 0; i < array.length - 1; i++) {
+            leftSum = leftSum + array[i];
+            rightSum = getRightSum(array, i + 1);
+            if (leftSum == rightSum) {
+                return true;
+            }
+        }
         return false;
+    }
+
+    private static int getRightSum(int[] array, int startIndex){
+        int sum = 0;
+        for (int i = startIndex; i < array.length; i++) {
+            sum = sum + array[i];
+        }
+        return sum;
     }
 
     /**
@@ -173,16 +200,66 @@ public class MainClass {
      * При каком n в какую сторону сдвиг можете выбирать сами.
      */
     public static void printShift(){
+        System.out.println("\nTask 7. Shift\n");
         System.out.println("Positive n for shift to the right");
         System.out.println("Nezative n for shift to the left");
-        int[] arr = {1, 2, 3};
-        int shift = 1;
-        int tmp = arr[0];
-        for (int i = 1; i < arr.length; i++) {
-            if (i+shift <= arr.length) {
+        int[] arr = {1, 2, 3, 4 , 5};
+        printArray(arr);
+        System.out.println("if N = 2:");
+        doShift(arr, 2);
+        printArray(arr);
+        int[] arr2 = {1, 2, 3, 4 , 5};
+        System.out.println("if N = -2:");
+        doShift(arr2, -2);
+        printArray(arr2);
+    }
 
-            }
+    private static int[] doShift(int[] arr, int shift){
+        if (abs(shift) > arr.length) {
+            shift = shift % arr.length;
         }
+        if (shift == 0) {
+            return arr; //при сдвиге 0 просто выходим, экономим ресурсы
+        }
+        int valuePrev;
+        int valueCurrent;
+        int n = 1;
+
+        if (shift > 0) {
+            while (n <= shift) {
+                valuePrev = arr[0];
+                for(int i = 1; i <= arr.length; i++) {
+                    if (i >= arr.length) {
+                        valueCurrent = arr[i - arr.length];
+                        arr[i - arr.length] = valuePrev;
+                    } else{
+                        valueCurrent = arr[i];
+                        arr[i] = valuePrev;
+                    }
+                    valuePrev = valueCurrent;
+                }
+                n++;
+            }
+            return arr;
+        }
+
+        n = -1;
+        while (n>=shift){
+            valuePrev = arr[arr.length - 1];
+            for (int i = arr.length - 2; i >= -1; i--) {
+                if (i == -1) {
+                    valueCurrent = arr[arr.length + i];
+                    arr[arr.length + i] = valuePrev;
+                } else{
+                    valueCurrent = arr[i];
+                    arr[i] = valuePrev;
+                }
+                valuePrev = valueCurrent;
+            }
+            n--;
+        }
+
+        return arr;
     }
 
     public static void printArray(int[] array) {
