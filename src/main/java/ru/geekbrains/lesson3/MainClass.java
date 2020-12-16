@@ -25,7 +25,7 @@ public class MainClass {
     }
 
     /**
-     * 1. Написать программу, которая загадывает случайное число от 0 до 9
+     * Игра "Угадай число". Программа загадывает случайное число от 0 до 9
      * и пользователю дается 3 попытки угадать это число. При каждой попытке
      * компьютер должен сообщить, больше ли указанное пользователем число,
      * чем загаданное, или меньше. После победы или проигрыша выводится запрос
@@ -36,42 +36,72 @@ public class MainClass {
         int targetNumber = random.nextInt(10);
         String resultMessage = "Falied.";
         int userValue;
-        System.out.println("Enter integer from 0 to 9");
+        System.out.println("Enter an integer between 0 and 9 inclusive:");
         for (int attempt = 0; attempt < 3; attempt++) {
-            userValue = getUserIntValue();
+            userValue = getUserValue();
             if (userValue == targetNumber) {
                 resultMessage = "You are winner!";
                 break;
             }
             if (userValue > targetNumber) {
-                System.out.println("Your number is greater than the target. Let's try again:\n");
+                System.out.println("Your number is greater than the target. " +
+                        "Let's try again:\n");
             } else {
-                System.out.println("Your number is less than the target. Let's try again:\n");
+                System.out.println("Your number is less than the target. " +
+                        "Let's try again:\n");
             }
         }
-        System.out.printf("%s Target number: %d. Play again? 1 - Yes, 0 - No\n", resultMessage, targetNumber);
+        getResultPlayDigit(resultMessage, targetNumber);
+    }
+
+    /**
+     * Выводит в консоль результат игры в "Угадай число". Предлагает сыграть
+     * снова. Если пользователь выбирает играть, то вызывает метод playDigit().
+     *
+     * @param resultMessage
+     *        сообщение с итогами игры.
+     * @param targetNumber
+     *        загаданное программой число
+     */
+    private static void getResultPlayDigit(String resultMessage, int targetNumber) {
+        System.out.printf("%s Target number: %d. Play again? 1 - Yes, 0 - No\n",
+                resultMessage, targetNumber);
 
         int userDecision = getUserDecision();
         if (userDecision == 1) {
             System.out.println("Well done! Let's go!");
             playDigit(); //используем рекурсию
         } else {
-            System.out.println("Game over. Good luck to your offline and come back! :)");
+            System.out.println("Game over. Good luck to your offline and " +
+                    "come back! :)");
         }
     }
 
+    /**
+     * Возвращает ответ пользователя и производит проверку на соответствие
+     * заданному алфавиту (0 или 1).
+     *
+     * @return ответ пользователя.
+     */
     private static int getUserDecision(){
         int userDecision;
         do {
             userDecision = getUserIntValue();
             if (userDecision != 0 && userDecision != 1 ){
-                System.out.println("Unknown answer. Please, enter one of two digits: 1 - Yes, 0 - No\n");
+                System.out.println("Unknown answer. Please, enter one of two " +
+                        "digits: 1 - Yes, 0 - No\n");
             } else {
                 return userDecision;
             }
         } while (true);
     }
 
+    /**
+     * Возвращает число, которое ввел пользователь с проверкой на тип введенного
+     * значения.
+     *
+     * @return число, введенное пользователем.
+     */
     private static int getUserIntValue(){
         int userValue;
         do {
@@ -80,9 +110,28 @@ public class MainClass {
                 userValue = sc.nextInt();
                 return userValue;
             } catch (InputMismatchException e) {
-                System.out.println("It's not an whole number! Please, try again:\n");
+                System.out.println("It's not an whole number! " +
+                        "Please, try again:\n");
             }
         } while (true);
+    }
+
+    /**
+     * Возвращает число, которое ввел пользователь с проверкой на вхождение в
+     * диапазон [0, 10].
+     *
+     * @return число, введенное пользователем.
+     */
+    private static int getUserValue(){
+        int userValue;
+        do {
+            userValue = getUserIntValue();
+            if (userValue < 0 || userValue > 9) {
+                System.out.println("Not accepted. Please, enter an integer " +
+                        "between 0 and 9 inclusive:");
+            }
+        } while(userValue < 0 || userValue > 9);
+        return  userValue;
     }
 
     /**
@@ -115,7 +164,6 @@ public class MainClass {
                 "potato"};
         Random random = new Random();
         int targetIndex = random.nextInt(words.length);
-        boolean isWordCorrect;
         String targetWord = words[targetIndex];
         String userWord;
         System.out.println("Please, select and enter the word from current " +
@@ -125,6 +173,12 @@ public class MainClass {
         checkUserWord(words, userWord, targetWord);
     }
 
+    /**
+     * Выводит в консоль строковый массив.
+     *
+     * @param array
+     *        строковый массив.
+     */
     private static void printArray(String[] array) {
         for (int i = 0; i < array.length; i++) {
             System.out.print(array[i] + ", ");
@@ -132,7 +186,12 @@ public class MainClass {
         System.out.println();
     }
 
-    private static String getUserValue(){
+    /**
+     * Возвращает строку, которую ввел пользователь.
+     *
+     * @return строку, введенную пользователем.
+     */
+    private static String getUserStringValue(){
         String userValue;
         do {
             try {
@@ -145,25 +204,55 @@ public class MainClass {
         } while (true);
     }
 
+    /**
+     * Возвращает слово, которое ввел пользователь с проверкой на наличие
+     * в массиве этого слова в принципе.
+     *
+     * @param words
+     *        массив слов.
+     * @return слово, введенное пользователем.
+     */
     private static String getUserWordWithCheck(String[] words){
-        //проверка на наличие в массиве этого слова в принципе
         String userWord;
         boolean isWordCorrect;
         do {
-            userWord = getUserValue();
+            userWord = getUserStringValue();
             isWordCorrect = isContinueWords(words, userWord);
             if (!isWordCorrect) {
-                System.out.println("Unknown word. \nPlease, select and enter the word from current array:");
+                System.out.println("Unknown word. \nPlease, select and enter " +
+                        "the word from current array:");
                 printArray(words);
             }
         } while (!isWordCorrect);
         return userWord;
     }
 
+    /**
+     * Проверяет, входит ли слово в массив слов.
+     *
+     * @param words
+     *        массив слов.
+     * @param word
+     *        слово, которое нужно проверить.
+     * @return {@code true} слово есть в массиве.
+     *         {@code false} слова в массиве нет.
+     */
     private static boolean isContinueWords (String[] words, String word) {
         return Arrays.asList(words).contains(word);
     }
 
+    /**
+     * Проверяет, угадал ли пользователь слово, и если не угадал, печатает
+     * угаданные буквы и рекурсивно вызывает метод - до тех пор, пока
+     * пользователь не угадает.
+     *
+     * @param words
+     *        строковый массив.
+     * @param userWord
+     *        слово, введенное пользователем.
+     * @param targetWord
+     *        слово, загаданное программой.
+     */
     private static void checkUserWord(String[] words, String userWord,
                                       String targetWord) {
         char userTargetChar;
