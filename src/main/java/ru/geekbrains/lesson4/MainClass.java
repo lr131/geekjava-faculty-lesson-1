@@ -28,9 +28,21 @@ public class MainClass {
                 field = moveComputerBy0(field);
                 printArray(field);
             }
-            //TODO проверка на победу
+            if (isWin(field, i)){
+                break;
+            }
         }
 
+    }
+
+    static boolean isWin(char[][] field, int i){
+        //TODO основные проверки по строкам, столбцам и диагоналям
+        if (i%2 == 0) {
+            System.out.println("You are winner!");
+        } else {
+            System.out.println("Failed. Game over!");
+        }
+        return false;
     }
 
     static char[][] moveUserByX(char[][] field){
