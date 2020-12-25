@@ -17,11 +17,10 @@ public class MainClass {
         System.out.println("Hi! You've just started the game Tic Tac Toe." +
                 "There're some rules:\n" +
                 "We always play on a square field, and the required sequence " +
-                "is always equal to the dimension of the field. \n" +
-                "The dimension is always integer and  greater than zero.\n\n" +
-                "\nPlease, enter field dimension:\n");
+                "is always equal to the dimension of the field. \n");
 
-        int dimension = getUserValue();
+        int dimension = setDimention();
+        int needLength = setLineLength(dimension);
         char[][] field = init(dimension);
         printArray(field);
         boolean draw = true;
@@ -34,7 +33,7 @@ public class MainClass {
                 field = moveComputerBy0(field);
                 printArray(field);
             }
-            if (isWin(field, i)){
+            if (isWin(field, i, needLength)){
                 draw = false;
                 break;
             }
@@ -43,7 +42,28 @@ public class MainClass {
             System.out.println("It's standoff! Nothings and nobody win. " +
                     "Nothings and nobody failed.");
         }
-
+    }
+    
+    static int setDimention(){
+        System.out.println("The dimension is always integer and greater than " +
+                "one.\n\nPlease, enter field dimension:\n");
+        int dimension;
+        do {
+            dimension = getUserValue();
+            if (dimension < 2) {
+                System.out.println("The dimension is always greater than one. " +
+                        "Please, try again:\n");
+            }
+        } while (dimension < 2);
+        return dimension;
+    }
+    
+    static int setLineLength(int dimension){
+        System.out.printf("Please, enter line length for the win." +
+                " Usually it is dimension of the field, but you can change it. Enter " +
+                "in integer between 2 and %d:", dimension);
+        System.out.println();
+        return getUserValueWithValidRange(2, dimension);
     }
 
     /**
@@ -55,11 +75,14 @@ public class MainClass {
      * @return {@code true} если ходок выиграл.
      *         {@code false} если победы не обнаружено.
      */
-    static boolean isWin(char[][] field, int n){
-        if (isWinLine(field) || isWinColumn(field) ||
-                isWinMainDiagonal(field) ||
-                isWinReverseDiagonal(field) ) {
-            if (n%2 == 0) {
+    static boolean isWin(char[][] field, int n, int needLength){
+        char currentLiter = (n%2 == 0) ? DOT_X : DOT_O;
+        if (isWinLine(field,currentLiter, needLength) || 
+                isWinColumn(field,currentLiter, needLength) ||
+                isWinMainDiagonal(field, currentLiter, needLength) ||
+                isWinReverseDiagonal(field, currentLiter, needLength)
+        ) {
+            if (currentLiter == DOT_X) {
                 System.out.println("You are winner!");
             } else {
                 System.out.println("Failed. Game over!");
@@ -76,22 +99,23 @@ public class MainClass {
      * @return {@code true} если ходок выиграл.
      *         {@code false} если победы не обнаружено.
      */
-    static boolean isWinLine(char[][] field){
-        boolean isWinFlag = false;
-            for (int i = 0; i < field.length; i++) {
-                if (isWinFlag) {
-                    return true;
-                }
-                for (int j = 0; j < field.length-1; j++) {
-                    if (field[i][j] != field[i][j+1]) {
+    static boolean isWinLine(char[][] field, char currentLiter, int needLength){
+        boolean isWinFlag;
+        for (int k = 0; k <= field.length - needLength; k++) { //комбинации в строке
+            for (int i = 0; i < field.length; i++) { //к-во строк
+                isWinFlag = true;
+                for (int j = k; j < needLength + k; j++) {//проверка в самой строке
+                    if (field[i][j] != currentLiter) {
                         isWinFlag = false;
                         break;
                     }
-                    if (field[i][j] != DOT_EMPTY) {
-                        isWinFlag = true;
-                    }
+                }
+                if (isWinFlag) {
+                    return true;
                 }
             }
+        }
+        
         return false;
     }
 
@@ -102,8 +126,8 @@ public class MainClass {
      * @return {@code true} если ходок выиграл.
      *         {@code false} если победы не обнаружено.
      */
-    static boolean isWinColumn(char[][] field){
-        return isWinLine(transpose(field));
+    static boolean isWinColumn(char[][] field, char currentLiter, int needLength){
+        return isWinLine(transpose(field),currentLiter, needLength);
     }
 
     /**
@@ -129,18 +153,53 @@ public class MainClass {
      * @return {@code true} если ходок выиграл.
      *         {@code false} если победы не обнаружено.
      */
-    static boolean isWinMainDiagonal(char[][] field){
-        boolean isWinFlag = false;
-            for (int i = 0; i < field.length - 1; i++) {
-                if (field[i][i] != field[i][i+1]) {
+    static boolean isWinMainDiagonal(char[][] field, char currentLiter, 
+                                     int needLength){
+        boolean isWinFlag;
+        for (int k = 0; k <= field.length - needLength; k++) {
+            isWinFlag = true;
+            for (int i = k; i < needLength + k; i++) {
+                if (field[i][i] != currentLiter) {
                     isWinFlag = false;
                     break;
                 }
-                if (field[i][i] != DOT_EMPTY) {
-                    isWinFlag = true;
-                }
             }
-        return isWinFlag;
+            if (isWinFlag) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    static boolean isWinUpperMainDiagonal(char[][] field, char currentLiter,
+                                          int needLength){
+        if (field.length == needLength) {
+            return false;
+        }
+        
+        int countShortDiagonals = field.length - needLength; 
+        int colIndex; // всегда больше 1
+        boolean isWinFlag;
+        
+        //Количество коротких диагоналей, которые надо проверить
+        for (int count = 0; count < countShortDiagonals; count ++){
+            //возможные варианты на одной диагонали
+            colIndex = field.length - needLength - count;
+            do{
+                isWinFlag = true;
+                for (int i = colIndex; i < needLength; i++) {
+                    if (field[colIndex-1][colIndex] != currentLiter){
+                        isWinFlag = false;
+                        break;
+                    }
+                }
+                if (isWinFlag) {
+                    return true;
+                }
+                colIndex++;
+            } while (colIndex + needLength <= field.length);            
+        }
+        return false;
     }
 
     /**
@@ -150,8 +209,22 @@ public class MainClass {
      * @return {@code true} если ходок выиграл.
      *         {@code false} если победы не обнаружено.
      */
-    static boolean isWinReverseDiagonal(char[][]field){
-        return isWinMainDiagonal(transpose(field));
+    static boolean isWinReverseDiagonal(char[][]field, char currentLiter, 
+                                        int needLength){
+        boolean isWinFlag;
+        for (int k = 0; k <= field.length - needLength; k++) {
+            isWinFlag = true;
+            for (int i = k; i < needLength + k; i++) {
+                if (field[i][needLength + k - i - 1] != currentLiter) {
+                    isWinFlag = false;
+                    break;
+                }
+            }
+            if (isWinFlag) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -168,11 +241,11 @@ public class MainClass {
             System.out.printf("Your Move! \n" +
                             "Please, Enter number of line between %d and %d inclusive:\n",
                     1, lenField);
-            userX = getUserCoordinateValue(1, lenField) - 1;
+            userX = getUserValueWithValidRange(1, lenField) - 1;
             System.out.printf("Your Move! \n" +
                             "Please, Enter number of line between %d and %d inclusive:\n",
                     1, lenField);
-            userY = getUserCoordinateValue(1, lenField) - 1;
+            userY = getUserValueWithValidRange(1, lenField) - 1;
             if (field[userX][userY] != DOT_EMPTY) {
                 System.out.println("The cell is already occupied. Please, try again.\n");
                 printArray(field);
@@ -279,13 +352,14 @@ public class MainClass {
      *
      * @return число, введенное пользователем.
      */
-    private static int getUserCoordinateValue(int from, int to){
+    private static int getUserValueWithValidRange(int from, int to){
         int userValue;
         do {
             userValue = getUserValue();
             if (userValue < from || userValue > to) {
-                System.out.printf("Not accepted. Please, enter an integer " +
+                System.out.printf("Value is not valid. Please, enter an integer " +
                         "between %d and %d inclusive:", from, to);
+                System.out.println();
             }
         } while(userValue < from || userValue > to);
         return  userValue;
