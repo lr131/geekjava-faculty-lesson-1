@@ -6,11 +6,11 @@ public class Employee {
     private String position;
     private String email;
     private String phone;
-    private int salary;
+    private float salary;
     private int age;
 
     public Employee(String lname, String nname, String position,
-                    String email, String phone, int age, int salary) {
+                    String email, String phone, int age, float salary) {
         this.lname = lname;
         this.nname = nname;
         this.phone = phone;
@@ -23,12 +23,16 @@ public class Employee {
     /**
      * Метод выводит в консоль информацию о сотруднике
      */
-    public void info(){
-        System.out.printf("Employee fullname: %s, %s.\n" +
-                "email: %s\nposition: %s\nphone: %s\nsalary: %d \n" +
-                "age: %d.\n", lname, nname, email, position, phone,
-                salary, age);
+    public void getInfo(){
+        System.out.println(toString());
         System.out.println();
+    }
+    
+    public String toString(){
+        return String.format("Employee fullname: %s, %s.\n" +
+                        "email: %s\nposition: %s\nphone: %s\nsalary: %.2f \n" +
+                        "age: %d.\n", lname, nname, email, position, phone,
+                salary, age);
     }
 
     /**

@@ -21,14 +21,14 @@ public class Main {
     static void selectGreaterAge(int greaterAge, Employee[] employes){
         for (int i = 0; i < employes.length; i++) {
             if (employes[i].getAge() > greaterAge) {
-                employes[i].info();
+                employes[i].getInfo();
             }
         }
     }
 
     static void printArray(Employee[] employes){
         for (int i = 0; i < employes.length; i++) {
-            employes[i].info();
+            employes[i].getInfo();
         }
     }
 
