@@ -27,6 +27,11 @@ public class Main {
         System.out.println("Let's checking every cat fill.");
         System.out.println();
         checkCatsFill(cats);
+        System.out.println("Let's add food to plate. Before:\n");
+        plate.getInfo();
+        plate.increaseFood(50);
+        System.out.println("After:\n");
+        plate.getInfo();
     }
 
     static void checkCatsFill(Cat[] cats){
